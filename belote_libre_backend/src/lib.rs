@@ -1,4 +1,5 @@
 pub mod card;
+pub mod hand;
 
 #[cfg(test)]
 mod tests {
