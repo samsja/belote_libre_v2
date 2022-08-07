@@ -1,7 +1,7 @@
 use crate::card::Card;
 use std::fmt;
 
-const MAX_HAND_CARD: usize = 8;
+const MAX_CARDS_HAND: usize = 8;
 
 #[derive(Debug)]
 pub struct Hand {
@@ -14,7 +14,7 @@ impl Hand {
     }
 
     pub fn new_empty() -> Hand {
-        let cards = Vec::with_capacity(MAX_HAND_CARD);
+        let cards = Vec::with_capacity(MAX_CARDS_HAND);
         Hand::new(cards)
     }
 
