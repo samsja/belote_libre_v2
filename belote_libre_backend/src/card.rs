@@ -1,6 +1,8 @@
 use std::fmt;
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+use strum_macros::EnumIter;
+
+#[derive(EnumIter, Debug, Copy, Clone, PartialEq)]
 pub enum Suit {
     Heart,
     Diamond,
@@ -8,7 +10,7 @@ pub enum Suit {
     Spade,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(EnumIter, Debug, Copy, Clone, PartialEq)]
 pub enum Symbol {
     Seven,
     Height,
