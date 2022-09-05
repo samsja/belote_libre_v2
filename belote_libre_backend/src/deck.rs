@@ -20,8 +20,12 @@ pub struct Deck {
 impl Deck {
     fn new_empty() -> Deck {
         Deck {
-            cards: Vec::with_capacity(MAX_CARDS_DECK),
+            cards: Deck::new_empty_vec_card(),
         }
+    }
+
+    fn new_empty_vec_card() -> Vec<Card> {
+        Vec::<Card>::with_capacity(MAX_CARDS_DECK)
     }
 
     pub fn new_ordered() -> Deck {
@@ -43,10 +47,9 @@ impl Deck {
         let max_indice = self.cards.len() - 1;
         let cut_indice = rng.gen_range(1..(max_indice - 1)); // it should not be the first or last
 
-        let mut bottom_deck = mem::replace(&mut self.cards, Vec::with_capacity(MAX_CARDS_DECK)); 
-        let mut top_deck = bottom_deck.split_off(cut_indice);
+        let mut top_deck = self.cards.split_off(cut_indice);
 
-        top_deck.append(&mut bottom_deck);
+        top_deck.append(&mut self.cards);
         self.cards = top_deck;
     }
 }
