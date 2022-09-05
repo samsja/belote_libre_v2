@@ -1,10 +1,13 @@
-use rand::seq::SliceRandom;
+use rand::prelude::SliceRandom;
 use rand::thread_rng;
+use rand::Rng;
 
 use crate::card::{Card, Suit, Symbol};
 
 use itertools::iproduct;
 use strum::IntoEnumIterator;
+
+use std::mem;
 
 const MAX_CARDS_DECK: usize = 42;
 
@@ -34,8 +37,17 @@ impl Deck {
         self.cards.shuffle(&mut thread_rng());
     }
 
-    pub fn cut(&mut self) {
-       // todo implement cut 
+    pub fn shuffle_cut(&mut self) {
+        // todo implement cut
+        let mut rng = thread_rng();
+        let max_indice = self.cards.len() - 1;
+        let cut_indice = rng.gen_range(1..(max_indice - 1)); // it should not be the first or last
+
+        let mut bottom_deck = mem::replace(&mut self.cards, Vec::with_capacity(MAX_CARDS_DECK)); 
+        let mut top_deck = bottom_deck.split_off(cut_indice);
+
+        top_deck.append(&mut bottom_deck);
+        self.cards = top_deck;
     }
 }
 
@@ -61,6 +73,14 @@ mod tests {
         let mut deck = Deck::new_ordered();
         assert_eq!(deck.cards.len(), 32);
         deck.shuffle();
+        assert_eq!(deck.cards.len(), 32);
+    }
+
+    #[test]
+    fn deck_cut() {
+        let mut deck = Deck::new_ordered();
+        assert_eq!(deck.cards.len(), 32);
+        deck.shuffle_cut();
         assert_eq!(deck.cards.len(), 32);
     }
 }
