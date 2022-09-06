@@ -7,8 +7,6 @@ use crate::card::{Card, Suit, Symbol};
 use itertools::iproduct;
 use strum::IntoEnumIterator;
 
-use std::mem;
-
 const MAX_CARDS_DECK: usize = 42;
 
 #[derive(Debug)]
