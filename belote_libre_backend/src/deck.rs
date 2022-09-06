@@ -7,7 +7,7 @@ use crate::card::{Card, Suit, Symbol};
 use itertools::iproduct;
 use strum::IntoEnumIterator;
 
-const MAX_CARDS_DECK: usize = 42;
+const MAX_CARDS_DECK: usize = 32;
 
 #[derive(Debug)]
 pub struct Deck {
@@ -32,6 +32,12 @@ impl Deck {
         deck.cards.extend(
             iproduct!(Suit::iter(), Symbol::iter()).map(|(suit, sym)| Card::new(suit, sym)),
         );
+        deck
+    }
+
+    pub fn new_shuffled() -> Deck {
+        let mut deck = Deck::new_ordered();
+        deck.shuffle();
         deck
     }
 
@@ -66,22 +72,29 @@ mod tests {
     fn init_deck_ordered() {
         let deck = Deck::new_ordered();
         println!("{:?}", deck);
-        assert_eq!(deck.cards.len(), 32);
+        assert_eq!(deck.cards.len(), MAX_CARDS_DECK);
     }
+
+    #[test]
+    fn init_deck_shuffled() {
+        let deck = Deck::new_shuffled();
+        assert_eq!(deck.cards.len(), MAX_CARDS_DECK);
+    }
+
 
     #[test]
     fn deck_shuffle() {
         let mut deck = Deck::new_ordered();
-        assert_eq!(deck.cards.len(), 32);
+        assert_eq!(deck.cards.len(), MAX_CARDS_DECK);
         deck.shuffle();
-        assert_eq!(deck.cards.len(), 32);
+        assert_eq!(deck.cards.len(), MAX_CARDS_DECK);
     }
 
     #[test]
     fn deck_cut() {
         let mut deck = Deck::new_ordered();
-        assert_eq!(deck.cards.len(), 32);
+        assert_eq!(deck.cards.len(), MAX_CARDS_DECK);
         deck.shuffle_cut();
-        assert_eq!(deck.cards.len(), 32);
+        assert_eq!(deck.cards.len(), MAX_CARDS_DECK);
     }
 }
