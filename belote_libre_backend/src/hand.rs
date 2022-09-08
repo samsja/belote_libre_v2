@@ -1,5 +1,6 @@
 use crate::card::Card;
 use std::fmt;
+use std::ops::Index;
 
 const MAX_CARDS_HAND: usize = 8;
 
@@ -53,6 +54,14 @@ impl fmt::Display for Hand {
     }
 }
 
+impl Index<usize> for Hand {
+    type Output = Card;
+
+    fn index(&self, indice: usize) -> &Self::Output {
+        &self.cards[indice]
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -80,5 +89,15 @@ mod tests {
         let card2 = hand.play_a_card(0).unwrap();
         assert_eq!(hand.len(), 0);
         assert_eq!(card, card2);
+    }
+
+    #[test]
+    fn get_card() {
+        let mut hand = Hand::new_empty();
+        let init_card = Card::new(Suit::Diamond, Symbol::Ten);
+        hand.push(init_card);
+        assert_eq!(hand.len(), 1);
+        let card = hand[0];
+        assert_eq!(card, init_card);
     }
 }
