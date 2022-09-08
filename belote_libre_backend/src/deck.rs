@@ -2,13 +2,15 @@ use rand::prelude::SliceRandom;
 use rand::thread_rng;
 use rand::Rng;
 
+
+use crate::hand::{Hand};
 use crate::card::{Card, Suit, Symbol};
 
 use itertools::iproduct;
 use strum::IntoEnumIterator;
 
 const MAX_CARDS_DECK: usize = 32;
-
+const CARD_PER_HAND: usize = 8;
 #[derive(Debug)]
 pub struct Deck {
     #[allow(dead_code)]
@@ -56,7 +58,12 @@ impl Deck {
         top_deck.append(&mut self.cards);
         self.cards = top_deck;
     }
-}
+
+    pub fn into_hands<'a>(&'a mut self) -> impl Iterator<Item = Hand> + 'a{
+        let iter = self.cards.chunks(CARD_PER_HAND);
+        iter.map(|x| Hand::new(x.to_vec()))
+    }
+}   
 
 #[cfg(test)]
 mod tests {
@@ -97,4 +104,21 @@ mod tests {
         deck.shuffle_cut();
         assert_eq!(deck.cards.len(), MAX_CARDS_DECK);
     }
+
+     #[test]
+    fn deck_to_hands() {
+        let mut deck = Deck::new_ordered();
+        assert_eq!(deck.cards.len(), MAX_CARDS_DECK);
+
+        let hands = deck.into_hands().collect::<Vec<Hand>>();
+        assert_eq!(hands.len(), 4); // there should be only 4 hands
+         
+        for hand_ in hands {
+            assert_eq!(hand_.len(), 8); // there should be only 4 hands
+        }
+    
+    }
+
+
+
 }
