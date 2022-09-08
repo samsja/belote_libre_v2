@@ -19,11 +19,15 @@ impl Fold {
         }
     }
 
+    pub fn len(&self) -> usize {
+        self.cards.len()
+    }
+
     pub fn is_over(&self) -> bool {
         return self.cards.len() >= MAX_CARDS_FOLD;
     }
 
-    pub fn play_a_card(&mut self, card: Card) -> bool {
+    pub fn is_play_valid(&mut self, card: Card) -> bool {
         if self.is_over() {
             return false;
         }
@@ -57,10 +61,10 @@ mod tests {
     }
 
     #[test]
-    fn play_a_card() {
+    fn is_play_valid() {
         let mut fold = Fold::new(GameContext::ToutAtout, Box::new(NoRule {}));
-        assert!(fold.play_a_card(Card::new(Suit::Diamond, Symbol::Ten)));
-        assert!(fold.play_a_card(Card::new(Suit::Diamond, Symbol::Ace)));
+        assert!(fold.is_play_valid(Card::new(Suit::Diamond, Symbol::Ten)));
+        assert!(fold.is_play_valid(Card::new(Suit::Diamond, Symbol::Ace)));
     }
 
     #[test]
@@ -68,11 +72,11 @@ mod tests {
         let mut fold = Fold::new(GameContext::ToutAtout, Box::new(NoRule {}));
 
         for _ in 0..MAX_CARDS_FOLD {
-            assert!(fold.play_a_card(Card::new(Suit::Diamond, Symbol::Ten)));
+            assert!(fold.is_play_valid(Card::new(Suit::Diamond, Symbol::Ten)));
         }
 
         assert_eq!(
-            fold.play_a_card(Card::new(Suit::Diamond, Symbol::Ten)),
+            fold.is_play_valid(Card::new(Suit::Diamond, Symbol::Ten)),
             false
         ); // 5th time should fail
     }

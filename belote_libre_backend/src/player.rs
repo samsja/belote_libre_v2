@@ -9,8 +9,6 @@ pub trait Player {
     }
 }
 
-
-
 pub struct BasicPlayer {
     hand: Hand,
 }
