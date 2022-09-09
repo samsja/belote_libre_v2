@@ -1,3 +1,5 @@
+use std::mem;
+
 use crate::card::Card;
 use crate::rules::{GameContext, Rule};
 
@@ -47,6 +49,10 @@ impl Fold {
             false
         }
     }
+
+    pub fn get_cards(&mut self) -> Vec<Card> {
+        mem::replace(&mut self.cards, Vec::with_capacity(MAX_CARDS_FOLD))
+    }
 }
 
 #[cfg(test)]
@@ -65,6 +71,7 @@ mod tests {
         let mut fold = Fold::new(GameContext::ToutAtout, Box::new(NoRule {}));
         assert!(fold.is_play_valid(Card::new(Suit::Diamond, Symbol::Ten)));
         assert!(fold.is_play_valid(Card::new(Suit::Diamond, Symbol::Ace)));
+        assert_eq!(fold.len(), 2);
     }
 
     #[test]
@@ -79,5 +86,19 @@ mod tests {
             fold.is_play_valid(Card::new(Suit::Diamond, Symbol::Ten)),
             false
         ); // 5th time should fail
+    }
+
+    #[test]
+    fn test_get_cards() {
+        let mut fold = Fold::new(GameContext::ToutAtout, Box::new(NoRule {}));
+
+        let card_ = Card::new(Suit::Diamond, Symbol::Ten);
+        assert!(fold.is_play_valid(card_));
+        assert_eq!(fold.len(), 1);
+
+        let cards = fold.get_cards();
+
+        assert_eq!(cards.len(), 1);
+        assert_eq!(cards[0], card_);
     }
 }

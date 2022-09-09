@@ -5,9 +5,12 @@ use crate::fold::Fold;
 use crate::player::{BasicPlayer, Player};
 use crate::rules::{GameContext, NoRule};
 
-pub fn game() -> Vec<Fold> {
+pub fn full_game() -> Vec<Fold> {
     let mut deck = Deck::new_shuffled();
+    game(&mut deck)
+}
 
+pub fn game(deck: &mut Deck) -> Vec<Fold> {
     let players = deck
         .into_hands()
         .map(|hand| BasicPlayer::new(hand))
@@ -47,14 +50,25 @@ pub fn game() -> Vec<Fold> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use itertools::concat;
 
     #[test]
     fn try_game() {
-        let folds = game();
+        let folds = full_game();
         assert_eq!(folds.len(), 8); // there should be 32/4 = 8 folds at the end
 
         for fold_ in folds {
             assert_eq!(fold_.len(), 4) // there should be only 4 card per fold
         }
+    }
+
+    #[test]
+    fn chain_game() {
+        let mut deck = Deck::new_shuffled();
+        let mut folds = game(&mut deck);
+        let cards_iter = folds.iter_mut().map(|fold| fold.get_cards());
+        let mut new_deck = Deck::new(concat(cards_iter));
+        new_deck.shuffle_cut();
+        game(&mut new_deck);
     }
 }

@@ -12,15 +12,17 @@ const MAX_CARDS_DECK: usize = 32;
 const CARD_PER_HAND: usize = 8;
 #[derive(Debug)]
 pub struct Deck {
-    #[allow(dead_code)]
     cards: Vec<Card>,
 }
 
 impl Deck {
+    
+    pub fn new(cards: Vec<Card>) -> Deck {
+        Deck { cards }
+    }
+
     fn new_empty() -> Deck {
-        Deck {
-            cards: Deck::new_empty_vec_card(),
-        }
+        Deck::new(Deck::new_empty_vec_card())
     }
 
     fn new_empty_vec_card() -> Vec<Card> {
