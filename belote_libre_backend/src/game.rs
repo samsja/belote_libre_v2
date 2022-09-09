@@ -1,3 +1,5 @@
+const MAX_PLAYER_ATTEMPT: usize = 10;
+
 use crate::deck::Deck;
 use crate::fold::Fold;
 use crate::player::{BasicPlayer, Player};
@@ -19,9 +21,20 @@ pub fn game() -> Vec<Fold> {
         let mut current_fold = Fold::new(GameContext::ToutAtout, Box::new(NoRule {}));
 
         for player_ in &players {
-            if current_fold.is_play_valid(player_.play_card()) {
-            } else {
-                panic!("Oh no a player played a wrong card")
+            let mut valid_play = false;
+
+            for _ in 0..MAX_PLAYER_ATTEMPT {
+                if current_fold.is_play_valid(player_.play_card()) {
+                    valid_play = true;
+                    break;
+                }
+            }
+
+            if !valid_play {
+                panic!(
+                    "Oh no a player played a wrong card for {} times",
+                    MAX_PLAYER_ATTEMPT
+                )
             }
         }
 
