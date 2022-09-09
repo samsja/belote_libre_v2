@@ -1,5 +1,3 @@
-const MAX_FOLDS: usize = 8;
-
 use crate::deck::Deck;
 use crate::fold::Fold;
 use crate::player::{BasicPlayer, Player};
@@ -13,9 +11,11 @@ pub fn game() -> Vec<Fold> {
         .map(|hand| BasicPlayer::new(hand))
         .collect::<Vec<BasicPlayer>>();
 
-    let mut folds = Vec::<Fold>::with_capacity(MAX_FOLDS);
+    let max_folds = players[0].get_hand().len();
 
-    for _ in 0..MAX_FOLDS {
+    let mut folds = Vec::<Fold>::with_capacity(max_folds);
+
+    for _ in 0..max_folds {
         let mut current_fold = Fold::new(GameContext::ToutAtout, Box::new(NoRule {}));
 
         for player_ in &players {
@@ -38,7 +38,7 @@ mod tests {
     #[test]
     fn try_game() {
         let folds = game();
-        assert_eq!(folds.len(), MAX_FOLDS);
+        assert_eq!(folds.len(), 8); // there should be 32/4 = 8 folds at the end
 
         for fold_ in folds {
             assert_eq!(fold_.len(), 4) // there should be only 4 card per fold
