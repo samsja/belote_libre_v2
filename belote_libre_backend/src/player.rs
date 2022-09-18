@@ -1,31 +1,20 @@
-use crate::card::Card;
 use crate::hand::Hand;
 
 pub trait Player {
-    fn play_card_id(&self) -> usize;
-    fn get_hand<'a>(&'a self) -> &'a Hand;
-    fn play_card(&self) -> Card {
-        self.get_hand()[self.play_card_id()]
-    }
+    fn play_card_id(&self, hand: &Hand) -> usize;
 }
 
-pub struct BasicPlayer {
-    hand: Hand,
-}
+pub struct BasicPlayer {}
 
 impl BasicPlayer {
-    pub fn new(hand: Hand) -> BasicPlayer {
-        BasicPlayer { hand }
+    pub fn new() -> BasicPlayer {
+        BasicPlayer {}
     }
 }
 
 impl Player for BasicPlayer {
-    fn play_card_id(&self) -> usize {
+    fn play_card_id(&self, _hand: &Hand) -> usize {
         0
-    }
-
-    fn get_hand<'a>(&'a self) -> &'a Hand {
-        &self.hand
     }
 }
 
@@ -41,9 +30,7 @@ mod tests {
 
         hand.push(init_card);
 
-        let player = BasicPlayer::new(hand);
-        let played_card = player.play_card();
-
-        assert_eq!(init_card, played_card);
+        let player = BasicPlayer::new();
+        player.play_card_id(&hand);
     }
 }

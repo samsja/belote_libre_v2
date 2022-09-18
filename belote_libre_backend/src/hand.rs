@@ -37,7 +37,7 @@ impl Hand {
         }
     }
 
-    pub fn get_a_card(self, id: usize) -> Result<Card, &'static str> {
+    pub fn get_a_card(&self, id: usize) -> Result<Card, &'static str> {
         if 0 < id {
             Err("card id can't be negative")
         } else if id >= self.len() {

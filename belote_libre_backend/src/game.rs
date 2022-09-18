@@ -2,6 +2,7 @@ const MAX_PLAYER_ATTEMPT: usize = 10;
 
 use crate::deck::Deck;
 use crate::fold::Fold;
+use crate::hand::Hand;
 use crate::player::{BasicPlayer, Player};
 use crate::rules::{GameContext, NoRule, Rule};
 
@@ -11,25 +12,39 @@ pub fn game() -> Vec<Fold> {
     game_wo_deck_init(&mut deck, rule)
 }
 
-pub fn game_wo_deck_init(deck: &mut Deck, rule: Box<dyn  Rule>) -> Vec<Fold> {
-    let players = deck
-        .into_hands()
-        .map(|hand| BasicPlayer::new(hand))
+pub fn game_wo_deck_init(deck: &mut Deck, rule: Box<dyn Rule>) -> Vec<Fold> {
+    let mut hands = deck.into_hands().collect::<Vec<Hand>>();
+    let players = (0..hands.len())
+        .into_iter()
+        .map(|_| BasicPlayer::new())
         .collect::<Vec<BasicPlayer>>();
 
-    let max_folds = players[0].get_hand().len();
+    let max_folds = hands[0].len();
 
     let mut folds = Vec::<Fold>::with_capacity(max_folds);
 
     for _ in 0..max_folds {
         let mut current_fold = Fold::new(GameContext::ToutAtout);
 
-        for player_ in &players {
+        for (player_, hand_) in players.iter().zip(hands.iter_mut()) {
             let mut valid_play = false;
 
             for _ in 0..MAX_PLAYER_ATTEMPT {
-                if current_fold.is_play_valid(&rule, player_.play_card()) {
-                    valid_play = true;
+                valid_play = match hand_.get_a_card(player_.play_card_id(&hand_)) {
+                    Ok(card) => {
+                        if current_fold.is_play_valid(&rule, card) {
+                            true
+                        } else {
+                            false
+                        }
+                    }
+                    Err(error) => {
+                        println!("{}", error); //should use logging
+                        false
+                    }
+                };
+
+                if valid_play {
                     break;
                 }
             }
