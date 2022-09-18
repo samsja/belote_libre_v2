@@ -3,14 +3,15 @@ const MAX_PLAYER_ATTEMPT: usize = 10;
 use crate::deck::Deck;
 use crate::fold::Fold;
 use crate::player::{BasicPlayer, Player};
-use crate::rules::{GameContext, NoRule};
+use crate::rules::{GameContext, NoRule, Rule};
 
-pub fn full_game() -> Vec<Fold> {
+pub fn game() -> Vec<Fold> {
     let mut deck = Deck::new_shuffled();
-    game(&mut deck)
+    let rule = Box::new(NoRule {});
+    game_wo_deck_init(&mut deck, rule)
 }
 
-pub fn game(deck: &mut Deck) -> Vec<Fold> {
+pub fn game_wo_deck_init(deck: &mut Deck, rule: Box<dyn  Rule>) -> Vec<Fold> {
     let players = deck
         .into_hands()
         .map(|hand| BasicPlayer::new(hand))
@@ -21,13 +22,13 @@ pub fn game(deck: &mut Deck) -> Vec<Fold> {
     let mut folds = Vec::<Fold>::with_capacity(max_folds);
 
     for _ in 0..max_folds {
-        let mut current_fold = Fold::new(GameContext::ToutAtout, Box::new(NoRule {}));
+        let mut current_fold = Fold::new(GameContext::ToutAtout);
 
         for player_ in &players {
             let mut valid_play = false;
 
             for _ in 0..MAX_PLAYER_ATTEMPT {
-                if current_fold.is_play_valid(player_.play_card()) {
+                if current_fold.is_play_valid(&rule, player_.play_card()) {
                     valid_play = true;
                     break;
                 }
@@ -40,10 +41,8 @@ pub fn game(deck: &mut Deck) -> Vec<Fold> {
                 )
             }
         }
-
         folds.push(current_fold);
     }
-
     folds
 }
 
@@ -54,21 +53,21 @@ mod tests {
 
     #[test]
     fn try_game() {
-        let folds = full_game();
+        let folds = game();
         assert_eq!(folds.len(), 8); // there should be 32/4 = 8 folds at the end
 
         for fold_ in folds {
-            assert_eq!(fold_.len(), 4) // there should be only 4 card per fold
+            assert_eq!(fold_.len(), 4) // there should be only 4 cards per fold
         }
     }
 
     #[test]
-    fn chain_game() {
+    fn chain_games() {
         let mut deck = Deck::new_shuffled();
-        let mut folds = game(&mut deck);
+        let mut folds = game_wo_deck_init(&mut deck, Box::new(NoRule {}));
         let cards_iter = folds.iter_mut().map(|fold| fold.get_cards());
         let mut new_deck = Deck::new(concat(cards_iter));
         new_deck.shuffle_cut();
-        game(&mut new_deck);
+        game_wo_deck_init(&mut new_deck, Box::new(NoRule {}));
     }
 }
