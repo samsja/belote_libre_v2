@@ -23,8 +23,9 @@ impl Fold {
     pub fn is_over(&self) -> bool {
         return self.cards.len() >= MAX_CARDS_FOLD;
     }
-
-    pub fn is_play_valid(&mut self, rule: &Box<dyn Rule>, card: Card) -> bool {
+    // &dyn Rule is used as suggest here :
+    // https://users.rust-lang.org/t/creating-reference-of-box/81413/26
+    pub fn is_play_valid(&mut self, rule: &dyn Rule, card: Card) -> bool {
         if self.is_over() {
             return false;
         }
@@ -53,15 +54,6 @@ mod tests {
     use crate::card::{Card, Suit, Symbol};
     use crate::rules::NoRule;
 
-    // this function is needed other wise I cant create a static box and the ref passing dot not
-    // work 
-    fn _hack_static_box(rule: Box<dyn Rule>) -> Box<dyn Rule + 'static> {
-        rule 
-    }
-    fn get_rule() -> Box<dyn Rule + 'static> { 
-        _hack_static_box(Box::new(NoRule {})) 
-    }
-
     #[test]
     fn init_fold() {
         let _fold = Fold::new(GameContext::ToutAtout);
@@ -70,8 +62,8 @@ mod tests {
     #[test]
     fn is_play_valid() {
         let mut fold = Fold::new(GameContext::ToutAtout);
-        assert!(fold.is_play_valid(&get_rule(), Card::new(Suit::Diamond, Symbol::Ten)));
-        assert!(fold.is_play_valid(&get_rule(), Card::new(Suit::Diamond, Symbol::Ace)));
+        assert!(fold.is_play_valid(&*Box::new(NoRule {}), Card::new(Suit::Diamond, Symbol::Ten)));
+        assert!(fold.is_play_valid(&*Box::new(NoRule {}), Card::new(Suit::Diamond, Symbol::Ace)));
         assert_eq!(fold.len(), 2);
     }
 
@@ -80,11 +72,13 @@ mod tests {
         let mut fold = Fold::new(GameContext::ToutAtout);
 
         for _ in 0..MAX_CARDS_FOLD {
-            assert!(fold.is_play_valid(&get_rule(), Card::new(Suit::Diamond, Symbol::Ten)));
+            assert!(
+                fold.is_play_valid(&*Box::new(NoRule {}), Card::new(Suit::Diamond, Symbol::Ten))
+            );
         }
 
         assert_eq!(
-            fold.is_play_valid(&get_rule(), Card::new(Suit::Diamond, Symbol::Ten)),
+            fold.is_play_valid(&*Box::new(NoRule {}), Card::new(Suit::Diamond, Symbol::Ten)),
             false
         ); // 5th time should fail
     }
@@ -94,7 +88,7 @@ mod tests {
         let mut fold = Fold::new(GameContext::ToutAtout);
 
         let card_ = Card::new(Suit::Diamond, Symbol::Ten);
-        assert!(fold.is_play_valid(&get_rule(), card_));
+        assert!(fold.is_play_valid(&*Box::new(NoRule {}), card_));
         assert_eq!(fold.len(), 1);
 
         let cards = fold.get_cards();

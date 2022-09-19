@@ -9,10 +9,10 @@ use crate::rules::{GameContext, NoRule, Rule};
 pub fn game() -> Vec<Fold> {
     let mut deck = Deck::new_shuffled();
     let rule = Box::new(NoRule {});
-    game_wo_deck_init(&mut deck, rule)
+    game_wo_deck_init(&mut deck, &*rule)
 }
 
-pub fn game_wo_deck_init(deck: &mut Deck, rule: Box<dyn Rule>) -> Vec<Fold> {
+pub fn game_wo_deck_init(deck: &mut Deck, rule: &dyn Rule) -> Vec<Fold> {
     let mut hands = deck.into_hands().collect::<Vec<Hand>>();
     let players = (0..hands.len())
         .into_iter()
@@ -32,7 +32,7 @@ pub fn game_wo_deck_init(deck: &mut Deck, rule: Box<dyn Rule>) -> Vec<Fold> {
             for _ in 0..MAX_PLAYER_ATTEMPT {
                 valid_play = match hand_.get_a_card(player_.play_card_id(&hand_)) {
                     Ok(card) => {
-                        if current_fold.is_play_valid(&rule, card) {
+                        if current_fold.is_play_valid(rule, card) {
                             true
                         } else {
                             false
@@ -79,10 +79,10 @@ mod tests {
     #[test]
     fn chain_games() {
         let mut deck = Deck::new_shuffled();
-        let mut folds = game_wo_deck_init(&mut deck, Box::new(NoRule {}));
+        let mut folds = game_wo_deck_init(&mut deck, &*Box::new(NoRule {}));
         let cards_iter = folds.iter_mut().map(|fold| fold.get_cards());
         let mut new_deck = Deck::new(concat(cards_iter));
         new_deck.shuffle_cut();
-        game_wo_deck_init(&mut new_deck, Box::new(NoRule {}));
+        game_wo_deck_init(&mut new_deck, &*Box::new(NoRule {}));
     }
 }
