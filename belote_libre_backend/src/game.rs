@@ -1,5 +1,6 @@
 const MAX_PLAYER_ATTEMPT: usize = 10;
 
+use crate::card::Card;
 use crate::deck::Deck;
 use crate::fold::Fold;
 use crate::hand::Hand;
@@ -22,39 +23,44 @@ pub fn game_wo_deck_init(deck: &mut Deck, rule: &dyn Rule) -> Vec<Fold> {
     let max_folds = hands[0].len();
 
     let mut folds = Vec::<Fold>::with_capacity(max_folds);
-
+    let game_context = GameContext::ToutAtout;
     for _ in 0..max_folds {
-        let mut current_fold = Fold::new(GameContext::ToutAtout);
+        let mut current_fold = Fold::new();
 
         for (player_, hand_) in players.iter().zip(hands.iter_mut()) {
-            let mut valid_play = false;
+            let mut card_played: Result<Card, &'static str> = Err("not initialized");
 
             for _ in 0..MAX_PLAYER_ATTEMPT {
-                valid_play = match hand_.get_a_card(player_.play_card_id(&hand_)) {
-                    Ok(card) => {
-                        if current_fold.is_play_valid(rule, card) {
-                            true
+                let need_break = false;
+                card_played = match hand_.get_a_card(player_.play_card_id(&hand_)) {
+                    Ok(card_played) => {
+                        if rule.is_play_valid(game_context, card_played, &current_fold) {
+                            Ok(card_played)
                         } else {
-                            false
+                            Err("card_played not valid")
                         }
                     }
                     Err(error) => {
-                        println!("{}", error); //should use logging
-                        false
+                        panic!("{}", error); //should use logging
                     }
                 };
 
-                if valid_play {
+                if need_break {
                     break;
                 }
             }
 
-            if !valid_play {
-                panic!(
-                    "Oh no a player played a wrong card for {} times",
-                    MAX_PLAYER_ATTEMPT
-                )
-            }
+            match card_played {
+                Ok(card) => {
+                    current_fold.push(card);
+                }
+                Err(_) => {
+                    panic!(
+                        "Oh no a player played a wrong card_played for {} times",
+                        MAX_PLAYER_ATTEMPT
+                    )
+                }
+            };
         }
         folds.push(current_fold);
     }
@@ -72,7 +78,7 @@ mod tests {
         assert_eq!(folds.len(), 8); // there should be 32/4 = 8 folds at the end
 
         for fold_ in folds {
-            assert_eq!(fold_.len(), 4) // there should be only 4 cards per fold
+            assert_eq!(fold_.len(), 4) // there should be only 4 card_playeds per fold
         }
     }
 
@@ -80,8 +86,8 @@ mod tests {
     fn chain_games() {
         let mut deck = Deck::new_shuffled();
         let mut folds = game_wo_deck_init(&mut deck, &*Box::new(NoRule {}));
-        let cards_iter = folds.iter_mut().map(|fold| fold.get_cards());
-        let mut new_deck = Deck::new(concat(cards_iter));
+        let card_playeds_iter = folds.iter_mut().map(|fold| fold.get_cards());
+        let mut new_deck = Deck::new(concat(card_playeds_iter));
         new_deck.shuffle_cut();
         game_wo_deck_init(&mut new_deck, &*Box::new(NoRule {}));
     }
