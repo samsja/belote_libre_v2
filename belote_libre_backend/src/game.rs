@@ -56,7 +56,7 @@ pub fn game_wo_deck_init(deck: &mut Deck, rule: &dyn Rule) -> Vec<Fold> {
                 }
                 Err(_) => {
                     panic!(
-                        "Oh no a player played a wrong card_played for {} times",
+                        "Oh no a player played a wrong card for {} times",
                         MAX_PLAYER_ATTEMPT
                     )
                 }
