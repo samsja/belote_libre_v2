@@ -1,6 +1,6 @@
 use std::mem;
 
-use crate::card::Card;
+use crate::card::{Card, Suit};
 
 const MAX_CARDS_FOLD: usize = 4;
 
@@ -9,6 +9,7 @@ pub struct Fold {
 }
 
 impl Fold {
+    
     pub fn new() -> Fold {
         let cards = Vec::with_capacity(MAX_CARDS_FOLD);
         Fold { cards }
@@ -28,6 +29,14 @@ impl Fold {
 
     pub fn push(&mut self, card: Card) {
         self.cards.push(card);
+    }
+
+    pub fn get_main_suit(&self) -> Result<Suit, &'static str> {
+        if self.len() == 0 {
+            Err("fold is empty no main color")
+        } else {
+            Ok(self.cards[0].suit)
+        }
     }
 }
 

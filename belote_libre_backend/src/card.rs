@@ -24,8 +24,8 @@ pub enum Symbol {
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Card {
-    suit: Suit,
-    symbol: Symbol,
+    pub suit: Suit,
+    pub symbol: Symbol,
 }
 
 impl Card {
