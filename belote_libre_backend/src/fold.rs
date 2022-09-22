@@ -9,7 +9,6 @@ pub struct Fold {
 }
 
 impl Fold {
-    
     pub fn new() -> Fold {
         let cards = Vec::with_capacity(MAX_CARDS_FOLD);
         Fold { cards }

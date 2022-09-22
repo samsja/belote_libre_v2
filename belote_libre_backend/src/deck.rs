@@ -16,7 +16,6 @@ pub struct Deck {
 }
 
 impl Deck {
-    
     pub fn new(cards: Vec<Card>) -> Deck {
         Deck { cards }
     }
