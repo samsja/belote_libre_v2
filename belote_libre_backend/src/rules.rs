@@ -22,13 +22,32 @@ impl Rule for NoRule {
 
 pub struct DefaultRule {}
 
-impl Rule for DefaultRule { //stil wip missing some rules
-    fn is_play_valid(&self, _context: GameContext, card: Card, fold: &Fold) -> bool {
+impl Rule for DefaultRule {
+    //stil wip missing some rules
+    fn is_play_valid(&self, context: GameContext, card: Card, fold: &Fold) -> bool {
+        match context {
+            GameContext::Atout(suit) => self.is_play_valid_atout(suit, card, fold),
+            GameContext::SansAtout => true,
+            GameContext::ToutAtout => true,
+        }
+    }
+}
+
+impl DefaultRule {
+    fn is_play_valid_atout(&self, suit_atout: Suit, card: Card, fold: &Fold) -> bool {
         let fold_suit = fold.get_main_suit();
 
         match fold_suit {
-            Ok(suit) => suit == card.suit,
-            Err(_) => true,
+            Ok(suit) => {
+                if card.suit == suit {
+                    true
+                } else if card.suit == suit_atout {
+                    true
+                } else {
+                    false
+                }
+            }
+            Err(_) => true, // if the fold is empty then you can play your card
         }
     }
 }
@@ -52,9 +71,10 @@ mod tests {
         fold.push(Card::new(Suit::Heart, Symbol::Seven));
 
         let rule = DefaultRule {};
-        let context = GameContext::SansAtout;
+        let context = GameContext::Atout(Suit::Diamond);
 
         assert!(rule.is_play_valid(context, Card::new(Suit::Heart, Symbol::Height), &fold));
         assert!(!rule.is_play_valid(context, Card::new(Suit::Spade, Symbol::Seven), &fold));
+        assert!(rule.is_play_valid(context, Card::new(Suit::Diamond, Symbol::Seven), &fold));
     }
 }
