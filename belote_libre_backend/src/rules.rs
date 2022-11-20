@@ -13,7 +13,7 @@ pub trait Rule {
     fn is_play_valid(
         &self,
         context: GameContext,
-        card_to_be_played: Card,
+        card_to_be_played: &Card,
         fold: &Fold,
         hand: &Hand,
     ) -> bool;
@@ -25,7 +25,7 @@ impl Rule for NoRule {
     fn is_play_valid(
         &self,
         _context: GameContext,
-        _card: Card,
+        _card: &Card,
         _fold: &Fold,
         _hand: &Hand,
     ) -> bool {
@@ -37,7 +37,7 @@ pub struct DefaultRule {}
 
 impl Rule for DefaultRule {
     //stil wip missing some rules
-    fn is_play_valid(&self, context: GameContext, card: Card, fold: &Fold, hand: &Hand) -> bool {
+    fn is_play_valid(&self, context: GameContext, card: &Card, fold: &Fold, hand: &Hand) -> bool {
         match context {
             GameContext::Atout(suit) => self.is_play_valid_atout(suit, card, fold, hand),
             GameContext::SansAtout => true,
@@ -47,8 +47,8 @@ impl Rule for DefaultRule {
 }
 
 impl DefaultRule {
-    fn is_play_valid_atout(&self, suit_atout: Suit, card: Card, fold: &Fold, hand: &Hand) -> bool {
-        if hand.contains(&card) {
+    fn is_play_valid_atout(&self, suit_atout: Suit, card: &Card, fold: &Fold, hand: &Hand) -> bool {
+        if hand.contains(card) {
             let fold_suit = fold.get_main_suit().unwrap();
             if card.suit == fold_suit {
                 true
@@ -75,7 +75,7 @@ mod tests {
         let context = GameContext::SansAtout;
         let card_to_play = Card::new(Suit::Heart, Symbol::Seven);
         let hand = Hand::new(vec![card_to_play]);
-        assert!(rule.is_play_valid(context, card_to_play, &fold, &hand))
+        assert!(rule.is_play_valid(context, &card_to_play, &fold, &hand))
     }
 
     #[test]
@@ -85,7 +85,7 @@ mod tests {
         let context = GameContext::Atout(Suit::Diamond);
         let card_to_play = Card::new(Suit::Heart, Symbol::Seven);
         let hand = Hand::new_empty();
-        assert!(!rule.is_play_valid(context, card_to_play, &fold, &hand))
+        assert!(!rule.is_play_valid(context, &card_to_play, &fold, &hand))
     }
 
     #[test]
@@ -105,7 +105,7 @@ mod tests {
         {
             let hand = Hand::new(vec![*card_to_play]);
 
-            let value = rule.is_play_valid(context, *card_to_play, &fold, &hand);
+            let value = rule.is_play_valid(context, card_to_play, &fold, &hand);
             assert!(value == *valid);
         }
     }
