@@ -73,6 +73,8 @@ macro_rules! card {
     }};
 }
 
+pub(crate) use card;
+
 #[cfg(test)]
 mod tests {
     use super::*;

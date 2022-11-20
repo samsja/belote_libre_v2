@@ -67,7 +67,8 @@ impl DefaultRule {
 mod tests {
     use super::*;
     use crate::card::{Card, Suit, Symbol};
-
+    use crate::card::{card, get_suit_shortcut, get_symbol_shortcut};
+    
     #[test]
     fn default_rule_empty_fold() {
         let fold = Fold::new();
@@ -115,7 +116,7 @@ mod tests {
     }
 
     main_color_tests! {
-        h8: (Card::new(Suit::Heart, Symbol::Height), true),
+        h8: (card!("H", "8"), true),
         s7: (Card::new(Suit::Spade, Symbol::Seven), false),
         d7: (Card::new(Suit::Diamond, Symbol::Seven), true),
     }
