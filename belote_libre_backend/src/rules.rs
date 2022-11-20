@@ -88,25 +88,35 @@ mod tests {
         assert!(!rule.is_play_valid(context, &card_to_play, &fold, &hand))
     }
 
-    #[test]
-    fn test_default_rule_main_color() {
+    fn default_rule_main_color_helper(card: &Card, valid: bool) {
         let mut fold = Fold::new();
         fold.push(Card::new(Suit::Heart, Symbol::Seven));
 
         let rule = DefaultRule {};
         let context = GameContext::Atout(Suit::Diamond);
 
-        for (card_to_play, valid) in vec![
-            (Card::new(Suit::Heart, Symbol::Height), true),
-            (Card::new(Suit::Spade, Symbol::Seven), false),
-            (Card::new(Suit::Diamond, Symbol::Seven), true),
-        ]
-        .iter()
-        {
-            let hand = Hand::new(vec![*card_to_play]);
+        let hand = Hand::new(vec![*card]);
 
-            let value = rule.is_play_valid(context, card_to_play, &fold, &hand);
-            assert!(value == *valid);
+        let value = rule.is_play_valid(context, card, &fold, &hand);
+        assert!(value == valid);
+    }
+
+    macro_rules! main_color_tests {
+        ($($name:ident: $value:expr,)*) => {
+        $(
+            #[test]
+            fn $name() {
+
+                let (card, valid) = $value;
+                default_rule_main_color_helper(&card, valid);
+            }
+        )*
         }
+    }
+
+    main_color_tests! {
+        h8: (Card::new(Suit::Heart, Symbol::Height), true),
+        s7: (Card::new(Suit::Spade, Symbol::Seven), false),
+        d7: (Card::new(Suit::Diamond, Symbol::Seven), true),
     }
 }
