@@ -1,5 +1,6 @@
 use crate::card::{Card, Suit};
 use crate::fold::Fold;
+use crate::hand::Hand;
 
 #[derive(Debug, Copy, Clone)]
 pub enum GameContext {
@@ -9,13 +10,25 @@ pub enum GameContext {
 }
 
 pub trait Rule {
-    fn is_play_valid(&self, context: GameContext, card_to_be_played: Card, fold: &Fold) -> bool;
+    fn is_play_valid(
+        &self,
+        context: GameContext,
+        card_to_be_played: Card,
+        fold: &Fold,
+        hand: &Hand,
+    ) -> bool;
 }
 
 pub struct NoRule {}
 
 impl Rule for NoRule {
-    fn is_play_valid(&self, _context: GameContext, _card: Card, _fold: &Fold) -> bool {
+    fn is_play_valid(
+        &self,
+        _context: GameContext,
+        _card: Card,
+        _fold: &Fold,
+        _hand: &Hand,
+    ) -> bool {
         true
     }
 }
@@ -24,9 +37,9 @@ pub struct DefaultRule {}
 
 impl Rule for DefaultRule {
     //stil wip missing some rules
-    fn is_play_valid(&self, context: GameContext, card: Card, fold: &Fold) -> bool {
+    fn is_play_valid(&self, context: GameContext, card: Card, fold: &Fold, hand: &Hand) -> bool {
         match context {
-            GameContext::Atout(suit) => self.is_play_valid_atout(suit, card, fold),
+            GameContext::Atout(suit) => self.is_play_valid_atout(suit, card, fold, hand),
             GameContext::SansAtout => true,
             GameContext::ToutAtout => true,
         }
@@ -34,20 +47,18 @@ impl Rule for DefaultRule {
 }
 
 impl DefaultRule {
-    fn is_play_valid_atout(&self, suit_atout: Suit, card: Card, fold: &Fold) -> bool {
-        let fold_suit = fold.get_main_suit();
-
-        match fold_suit {
-            Ok(suit) => {
-                if card.suit == suit {
-                    true
-                } else if card.suit == suit_atout {
-                    true
-                } else {
-                    false
-                }
+    fn is_play_valid_atout(&self, suit_atout: Suit, card: Card, fold: &Fold, hand: &Hand) -> bool {
+        if hand.contains(&card) {
+            let fold_suit = fold.get_main_suit().unwrap();
+            if card.suit == fold_suit {
+                true
+            } else if card.suit == suit_atout {
+                true
+            } else {
+                false
             }
-            Err(_) => true, // if the fold is empty then you can play your card
+        } else {
+            false
         }
     }
 }
@@ -62,7 +73,19 @@ mod tests {
         let fold = Fold::new();
         let rule = DefaultRule {};
         let context = GameContext::SansAtout;
-        assert!(rule.is_play_valid(context, Card::new(Suit::Heart, Symbol::Seven), &fold))
+        let card_to_play = Card::new(Suit::Heart, Symbol::Seven);
+        let hand = Hand::new(vec![card_to_play]);
+        assert!(rule.is_play_valid(context, card_to_play, &fold, &hand))
+    }
+
+    #[test]
+    fn default_rule_empty_hand() {
+        let fold = Fold::new();
+        let rule = DefaultRule {};
+        let context = GameContext::Atout(Suit::Diamond);
+        let card_to_play = Card::new(Suit::Heart, Symbol::Seven);
+        let hand = Hand::new_empty();
+        assert!(!rule.is_play_valid(context, card_to_play, &fold, &hand))
     }
 
     #[test]
@@ -73,8 +96,17 @@ mod tests {
         let rule = DefaultRule {};
         let context = GameContext::Atout(Suit::Diamond);
 
-        assert!(rule.is_play_valid(context, Card::new(Suit::Heart, Symbol::Height), &fold));
-        assert!(!rule.is_play_valid(context, Card::new(Suit::Spade, Symbol::Seven), &fold));
-        assert!(rule.is_play_valid(context, Card::new(Suit::Diamond, Symbol::Seven), &fold));
+        for (card_to_play, valid) in vec![
+            (Card::new(Suit::Heart, Symbol::Height), true),
+            (Card::new(Suit::Spade, Symbol::Seven), false),
+            (Card::new(Suit::Diamond, Symbol::Seven), true),
+        ]
+        .iter()
+        {
+            let hand = Hand::new(vec![*card_to_play]);
+
+            let value = rule.is_play_valid(context, *card_to_play, &fold, &hand);
+            assert!(value == *valid);
+        }
     }
 }

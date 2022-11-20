@@ -46,6 +46,10 @@ impl Hand {
             Ok(self.cards[id])
         }
     }
+
+    pub fn contains(&self, card: &Card) -> bool {
+        self.cards.contains(card)
+    }
 }
 
 impl fmt::Display for Hand {

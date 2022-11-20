@@ -34,7 +34,7 @@ pub fn game_wo_deck_init(deck: &mut Deck, rule: &dyn Rule) -> Vec<Fold> {
                 let need_break = false;
                 card_played = match hand_.get_a_card(player_.play_card_id(&hand_)) {
                     Ok(card_played) => {
-                        if rule.is_play_valid(game_context, card_played, &current_fold) {
+                        if rule.is_play_valid(game_context, card_played, &current_fold, &hand_) {
                             Ok(card_played)
                         } else {
                             Err("card_played not valid")
