@@ -47,15 +47,45 @@ impl Rule for DefaultRule {
 }
 
 impl DefaultRule {
+    fn is_play_valid_suit_atout(
+        _suit_atout: &Suit,
+        _card: &Card,
+        _fold: &Fold,
+        _hand: &Hand,
+    ) -> bool {
+        true
+        // need to implement
+    }
+
+    fn is_partner_master_of_the_fold(_fold: &Fold) -> bool {
+        true
+        // need to implement
+    }
+
     fn is_play_valid_atout(&self, suit_atout: Suit, card: &Card, fold: &Fold, hand: &Hand) -> bool {
         if hand.contains(card) {
             let fold_suit = fold.get_main_suit().unwrap();
-            if card.suit == fold_suit {
-                true
-            } else if card.suit == suit_atout {
-                true
+
+            if hand.contains_suit(&fold_suit) {
+                if card.suit == fold_suit {
+                    if fold_suit == suit_atout {
+                        DefaultRule::is_play_valid_suit_atout(&suit_atout, card, fold, hand)
+                    } else {
+                        true
+                    }
+                } else {
+                    false
+                }
             } else {
-                false
+                if hand.contains_suit(&suit_atout) {
+                    if card.suit != suit_atout {
+                        DefaultRule::is_partner_master_of_the_fold(fold)
+                    } else {
+                        DefaultRule::is_play_valid_suit_atout(&suit_atout, card, fold, hand)
+                    }
+                } else {
+                    true
+                }
             }
         } else {
             false
@@ -66,9 +96,9 @@ impl DefaultRule {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::card::{Card, Suit, Symbol};
     use crate::card::{card, get_suit_shortcut, get_symbol_shortcut};
-    
+    use crate::card::{Card, Suit, Symbol};
+
     #[test]
     fn default_rule_empty_fold() {
         let fold = Fold::new();
@@ -87,37 +117,5 @@ mod tests {
         let card_to_play = Card::new(Suit::Heart, Symbol::Seven);
         let hand = Hand::new_empty();
         assert!(!rule.is_play_valid(context, &card_to_play, &fold, &hand))
-    }
-
-    fn default_rule_main_color_helper(card: &Card, valid: bool) {
-        let mut fold = Fold::new();
-        fold.push(Card::new(Suit::Heart, Symbol::Seven));
-
-        let rule = DefaultRule {};
-        let context = GameContext::Atout(Suit::Diamond);
-
-        let hand = Hand::new(vec![*card]);
-
-        let value = rule.is_play_valid(context, card, &fold, &hand);
-        assert!(value == valid);
-    }
-
-    macro_rules! main_color_tests {
-        ($($name:ident: $value:expr,)*) => {
-        $(
-            #[test]
-            fn $name() {
-
-                let (card, valid) = $value;
-                default_rule_main_color_helper(&card, valid);
-            }
-        )*
-        }
-    }
-
-    main_color_tests! {
-        h8: (card!("H", "8"), true),
-        s7: (Card::new(Suit::Spade, Symbol::Seven), false),
-        d7: (Card::new(Suit::Diamond, Symbol::Seven), true),
     }
 }

@@ -11,7 +11,7 @@ pub enum Suit {
     Spade,
 }
 
-#[derive(EnumIter, Debug, Copy, Clone, PartialEq)]
+#[derive(EnumIter, Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub enum Symbol {
     Seven,
     Height,
@@ -91,5 +91,13 @@ mod tests {
         let card2 = card!("H", "7");
 
         assert!(card == card2);
+    }
+
+    #[test]
+    fn test_symbol_order() {
+        let card = card!("H", "7");
+        let card2 = card!("H", "8");
+
+        assert!(card.symbol < card2.symbol)
     }
 }
