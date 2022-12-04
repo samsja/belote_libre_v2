@@ -1,4 +1,4 @@
-use crate::card::Card;
+use crate::card::{Card, Suit};
 use std::fmt;
 use std::ops::Index;
 
@@ -50,6 +50,20 @@ impl Hand {
     pub fn contains(&self, card: &Card) -> bool {
         self.cards.contains(card)
     }
+
+    pub fn contains_suit(&self, suit: &Suit) -> bool {
+        
+        let mut contains_suit = false;
+        for card in self.cards.iter() {
+            if *suit == card.suit{
+                contains_suit = true;
+                break;
+            }
+        }
+        
+        contains_suit
+        
+    }
 }
 
 impl fmt::Display for Hand {
@@ -70,6 +84,8 @@ impl Index<usize> for Hand {
 mod tests {
     use super::*;
     use crate::card::{Card, Suit, Symbol};
+    use crate::card::{card, get_suit_shortcut, get_symbol_shortcut};
+    
 
     #[test]
     fn init_hand_empty() {
@@ -104,4 +120,18 @@ mod tests {
         let card = hand[0];
         assert_eq!(card, init_card);
     }
+
+    #[test]
+    fn contains_card() {
+        let mut hand = Hand::new_empty();
+        hand.push(card!("D", "7"));
+        hand.push(card!("D", "8"));
+        hand.push(card!("H", "7"));
+        
+        assert!(hand.contains_suit(&Suit::Diamond)); 
+        assert!(hand.contains_suit(&Suit::Heart));
+        assert!(!hand.contains_suit(&Suit::Spade));
+        assert!(!hand.contains_suit(&Suit::Club));
+    }
+    
 }
