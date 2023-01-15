@@ -11,7 +11,7 @@ pub enum Suit {
     Spade,
 }
 
-#[derive(EnumIter, Debug, Copy, Clone, PartialEq, PartialOrd)]
+#[derive(EnumIter, Debug, Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub enum Symbol {
     Seven,
     Height,

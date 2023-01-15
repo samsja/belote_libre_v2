@@ -52,17 +52,15 @@ impl Hand {
     }
 
     pub fn contains_suit(&self, suit: &Suit) -> bool {
-        
         let mut contains_suit = false;
         for card in self.cards.iter() {
-            if *suit == card.suit{
+            if *suit == card.suit {
                 contains_suit = true;
                 break;
             }
         }
-        
+
         contains_suit
-        
     }
 }
 
@@ -83,9 +81,8 @@ impl Index<usize> for Hand {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::card::{Card, Suit, Symbol};
     use crate::card::{card, get_suit_shortcut, get_symbol_shortcut};
-    
+    use crate::card::{Card, Suit, Symbol};
 
     #[test]
     fn init_hand_empty() {
@@ -127,11 +124,10 @@ mod tests {
         hand.push(card!("D", "7"));
         hand.push(card!("D", "8"));
         hand.push(card!("H", "7"));
-        
-        assert!(hand.contains_suit(&Suit::Diamond)); 
+
+        assert!(hand.contains_suit(&Suit::Diamond));
         assert!(hand.contains_suit(&Suit::Heart));
         assert!(!hand.contains_suit(&Suit::Spade));
         assert!(!hand.contains_suit(&Suit::Club));
     }
-    
 }

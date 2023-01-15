@@ -5,7 +5,7 @@ use crate::card::{Card, Suit};
 const MAX_CARDS_FOLD: usize = 4;
 
 pub struct Fold {
-    cards: Vec<Card>,
+    pub cards: Vec<Card>,
 }
 
 impl Fold {
