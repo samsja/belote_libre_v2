@@ -9,8 +9,12 @@ pub struct Fold {
 }
 
 impl Fold {
-    pub fn new() -> Fold {
+    pub fn new_empty() -> Fold {
         let cards = Vec::with_capacity(MAX_CARDS_FOLD);
+        Fold::new(cards)
+    }
+
+    pub fn new(cards: Vec<Card>) -> Fold {
         Fold { cards }
     }
 
@@ -43,8 +47,11 @@ impl Fold {
 mod tests {
     use super::*;
 
+    use crate::card::{card, get_suit_shortcut, get_symbol_shortcut};
+    use crate::card::{Card, Suit, Symbol};
+
     #[test]
     fn init_fold() {
-        let _fold = Fold::new();
+        let _fold = Fold::new_empty();
     }
 }

@@ -113,7 +113,7 @@ mod tests {
 
     #[test]
     fn default_rule_empty_fold() {
-        let fold = Fold::new();
+        let fold = Fold::new_empty();
         let rule = DefaultRule {};
         let context = GameContext::SansAtout;
         let card_to_play = Card::new(Suit::Heart, Symbol::Seven);
@@ -123,7 +123,7 @@ mod tests {
 
     #[test]
     fn default_rule_empty_hand() {
-        let fold = Fold::new();
+        let fold = Fold::new_empty();
         let rule = DefaultRule {};
         let context = GameContext::Atout(Suit::Diamond);
         let card_to_play = Card::new(Suit::Heart, Symbol::Seven);
@@ -133,7 +133,7 @@ mod tests {
 
     #[test]
     fn up_atout() {
-        let mut fold = Fold::new();
+        let mut fold = Fold::new_empty();
         fold.push(card!("D", "8"));
         let rule = DefaultRule {};
         let context = GameContext::Atout(Suit::Diamond);

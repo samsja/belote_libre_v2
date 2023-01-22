@@ -25,7 +25,7 @@ pub fn game_wo_deck_init(deck: &mut Deck, rule: &dyn Rule) -> Vec<Fold> {
     let mut folds = Vec::<Fold>::with_capacity(max_folds);
     let game_context = GameContext::ToutAtout;
     for _ in 0..max_folds {
-        let mut current_fold = Fold::new();
+        let mut current_fold = Fold::new_empty();
 
         for (player_, hand_) in players.iter().zip(hands.iter_mut()) {
             let mut card_played: Result<Card, &'static str> = Err("not initialized");
